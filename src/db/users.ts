@@ -3,6 +3,7 @@ import mongoose from "mongoose"
 const UserSchema = new mongoose.Schema({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
+    username: {type: String, required: true },
     userType: { type: String, required: true },
     email: { type: String, required: true },
     authentication: {
@@ -16,6 +17,7 @@ export const UserModel = mongoose.model('User', UserSchema);
 
 export const getUsers = () => UserModel.find();
 export const getUserByEmail = (email: string) => UserModel.findOne({ email });
+export const getUserByUsername = (username: string) => UserModel.findOne({ username });
 export const getUserBySessionToken = (sessionToken: string) => UserModel.findOne({
     'authentication.sessionToken': sessionToken,
 });

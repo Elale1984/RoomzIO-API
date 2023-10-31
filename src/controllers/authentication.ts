@@ -1,16 +1,16 @@
-import { createUser, getUserByEmail } from "../db/users";
+import { createUser, getUserByEmail, getUserByUsername } from "../db/users";
 import express from "express";
 import { authentication, random } from '../helpers';
 
 export const login = async (req: express.Request, res: express.Response) => {
     try {
-        const { email, password } = req.body;
+        const { username, password } = req.body;
 
-        if(!email || !password) {
+        if(!username || !password) {
             return res.sendStatus(400);
         }
 
-        const user = (await getUserByEmail(email).select('+authentication.salt +authentication.password'));
+        const user = (await getUserByUsername(username).select('+authentication.salt +authentication.password'));
 
         if(!user){
             return res.sendStatus(400);
@@ -37,13 +37,13 @@ export const login = async (req: express.Request, res: express.Response) => {
 
 export const register =async (req: express.Request, res: express.Response) => {
     try {
-        const { firstName, userType, lastName, email, password } = req.body;
+        const { firstName, lastName, username, userType, email, password } = req.body;
 
-        if(!firstName || !lastName || !userType || !email || !password) {
+        if(!firstName || !lastName || !userType || !username || !email || !password) {
             return res.status(400);
         }
 
-        const existingUser = await getUserByEmail(email);
+        const existingUser = await getUserByUsername(username);
 
         if(existingUser){
             return res.status(400);
@@ -53,6 +53,7 @@ export const register =async (req: express.Request, res: express.Response) => {
         const user = await createUser({
             firstName,
             lastName,
+            username,
             userType,
             email,
             authentication: {
