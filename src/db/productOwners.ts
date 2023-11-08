@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
-import { SubscriptionModel } from "./subscription";
-
+import { SubscriptionModel } from "./Subscription";
 
 /* ProductOwnerSchema using mongoose to send the schema to MongoDB */
 const ProductOwnerSchema = new mongoose.Schema({

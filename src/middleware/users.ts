@@ -1,6 +1,6 @@
 import express, { response } from 'express';
 import { get, merge } from 'lodash';
-import { getUserById, getUserBySessionToken } from '../db/users';
+import { getUserById, getUserBySessionToken } from '../db/Users';
 
 
 // Checking the userType of the current user to make sure that they have access level of admin
