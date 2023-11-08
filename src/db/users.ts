@@ -35,7 +35,7 @@ export const getUserBySessionToken = (sessionToken: string) => UserModel.findOne
 /* Create a new user object */
 export const createUser = (values: Record<string, any>) => new UserModel(values).save().then((user) => user.toObject());
 
-/* Find a users by specific field(s) like ID, email, or username */
+/* Find users by specific field(s) like ID, email, or username */
 export const findUser = (query: Record<string, any>) => {
     return UserModel.findOne(query);
 };

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { AddressModel } from "./Address";
 
 /* CreditCardDetailsSchema using mongoose to send the schema to MongoDB */
 const CreditCardDetailsSchema = new mongoose.Schema({
@@ -6,7 +7,7 @@ const CreditCardDetailsSchema = new mongoose.Schema({
     cardHolderName: { type: String, required: true },
     cardExpirationDate: { type: Date, required: true },
     cardCVV: { type: String, required: true },
-    cardBillingAddress: { type: Address, required: true },
+    cardBillingAddress: { type: AddressModel, required: true },
 });
 
 /* Creating the Mongoose model for CreditCardDetails objects */
