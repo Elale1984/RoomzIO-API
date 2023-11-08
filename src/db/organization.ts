@@ -1,4 +1,6 @@
 import mongoose, { mongo } from "mongoose";
+import { AddressModel } from "./Address";
+import { FacilityModel } from "./Facility";
 
 /* OrganizationSchema using mongoose to send the schema to MongoDB */
 const OrganizationSchema = new mongoose.Schema({
@@ -7,19 +9,26 @@ const OrganizationSchema = new mongoose.Schema({
     organizationDateCreated: { type: Date, required: true },
     organizationCapacity: { type: Number, required: true },
     organizationTotalFacilityCount: { type: Number, required: true },
-    organizationFacilities: { type: Array<Facility>, required: true },
-    organizationAddress: { type: Address, required: true },
+    organizationFacilities: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Facility',
+          required: true,
+        },
+      ],
+    
+    organizationAddress: { type: AddressModel, required: true },
     
 });
 
 /* Creating the Mongoose model for organization objects */
-export const OrganizationModel = mongoose.model('Organization', OrganizationSchema),
+export const OrganizationModel = mongoose.model('Organization', OrganizationSchema);
 
 /* Retrieve all Organizations from the database for in house use */
 export const getOrganizations = () => OrganizationModel.find();
 
 /* Retrieve a Organization by their ID */
-export const getOrganizationByIt = (id: string) => OrganizationModel.findById(id);
+export const getOrganizationById = (id: string) => OrganizationModel.findById(id);
 
 /* CRUD methods for Organization objects */
 /* Create a new Organization object */
@@ -31,16 +40,18 @@ export const findOrganizations = (query: Record<string, any>) => {
 };
 
 /* Delete a Organization by their ID */
-export const deleteOrganizationById = (id: string) => OrganizationModel.findByIdAndDelete(id);
+export const deleteOrganizationById = (id: string) => OrganizationModel.findByIdAndDelete({ _id: id });
 
 /* Update a Organization by their ID, modifying one or more fields */
 export const updateOrganizationById = (id: string, updatedFields: Record<string, any>) => {
     return OrganizationModel.findByIdAndUpdate(id, updatedFields);
 };
 
-/* Add a new Facility of type Facility to the organizations Facility array */
-export const addFacilityToOrganizationById = (id: string, facility: Facility) => {
-    return OrganizationModel.findByIdAndUpdate(id, {
-        $push: { organizationFacilities: facility }
-    });
+/* Add a new Facility of type Facility to the organization's Facility array */
+export const addFacilityToOrganizationById = (id: string, facility: typeof FacilityModel) => {
+    return OrganizationModel.findByIdAndUpdate(
+        id,
+        { $push: { organizationFacilities: facility } },
+        { new: true } 
+    );
 };
