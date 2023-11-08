@@ -45,11 +45,13 @@ export const updateFacilityById = (id: string, updatedFields: Record<string, any
     return FacilityModel.findByIdAndUpdate(id, updateFacilityById);
 }
 
+//TODO = Create the Wing Class. 
 /* Add a new Wing of type Wing to the facility's wing array */
-export const addWingToFacilityById = (id: string, wing: typeof WingModel) => {
+export const addWingToFacilityById = (id: string, wing: typeof WingModel) => { 
     return FacilityModel.findByIdAndUpdate(
         id,
         { $push: { facilityWings: wing } },
         { new: true } 
     );
 };
+
