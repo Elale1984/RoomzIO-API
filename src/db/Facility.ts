@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { AddressModel } from "./Address";
+import { WingModel } from "./Wing";
 
 /* FacilitySchema using mongoose to send the schema to MongoDB */
 const FacilitySchema = new mongoose.Schema({
@@ -42,10 +43,9 @@ export const deleteFacilityById = (id: string) => FacilityModel.findByIdAndDelet
 
 /* Update a facility by their ID, modifying one or more fields */
 export const updateFacilityById = (id: string, updatedFields: Record<string, any>) => {
-    return FacilityModel.findByIdAndUpdate(id, updateFacilityById);
+    return FacilityModel.findByIdAndUpdate(id, updatedFields);
 }
 
-//TODO = Create the Wing Class. 
 /* Add a new Wing of type Wing to the facility's wing array */
 export const addWingToFacilityById = (id: string, wing: typeof WingModel) => { 
     return FacilityModel.findByIdAndUpdate(
