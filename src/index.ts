@@ -6,7 +6,6 @@ import compression from 'compression';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import router from './router';
-import requestLoggerMiddleware from 'middleware/loggerMiddleware';
 
 
 
@@ -21,8 +20,6 @@ app.use(compression());
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use('/', router());
-// Use the requestLoggerMiddleware for all routes
-app.use(requestLoggerMiddleware);
 
 const server = http.createServer(app);
 

@@ -8,7 +8,7 @@ interface Log extends Document {
 }
 
 /* LogSchema using mongoose to send the schema to MongoDB */
-const LogSchema: Schema = new mongoose.Schema({
+const MongoDBLoggerSchema: Schema = new mongoose.Schema({
   level: { type: String, required: true },
   message: { type: String, required: true },
   timestamp: { type: Date, default: Date.now },
@@ -16,7 +16,7 @@ const LogSchema: Schema = new mongoose.Schema({
 });
 
 /* Creating the Mongoose model for log objects */
-export const MongoDBLogsModel = mongoose.model<Log>("Log", LogSchema);
+export const MongoDBLogsModel = mongoose.model<Log>("Log", MongoDBLoggerSchema);
 
 /* Log functions for CRUD operations */
 /* Create a new log entry */

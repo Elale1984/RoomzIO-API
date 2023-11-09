@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { MongoDBLogsModel} from '../db/MongoDBLogs';
+import { MongoDBLogsModel } from '../db/MongoDBLogs';
 
-const requestLoggerMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+/**
+ * Middleware to log incoming requests to MongoDBLogs.
+ */
+export const mongoDBRequestLoggerMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Log the request information
     await MongoDBLogsModel.create({
@@ -17,5 +20,3 @@ const requestLoggerMiddleware = async (req: Request, res: Response, next: NextFu
     res.status(500).send('Internal Server Error');
   }
 };
-
-export default requestLoggerMiddleware;
