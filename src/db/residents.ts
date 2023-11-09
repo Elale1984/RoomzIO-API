@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
-
+import  { RoomSchema } from './Room'
 /* ResidentSchema using mongoose to send the schema to MongoDB */
 const ResidentSchema = new mongoose.Schema({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     moveInDate: { type: Date, required: true },
     moveOutDate: { type: Date, required: true },
-    room: { type: Room, required: true }, 
+    room: { type: RoomSchema, required: true }, 
 });
 
 
