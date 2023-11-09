@@ -19,7 +19,7 @@ app.use(cors({
 app.use(compression());
 app.use(cookieParser());
 app.use(bodyParser.json());
-
+app.use('/', router());
 
 const server = http.createServer(app);
 
@@ -33,6 +33,4 @@ const MONGO_URL = 'mongodb+srv://elale84:Deadhead_1@cluster0.4wro2mt.mongodb.net
 mongoose.Promise = Promise;
 mongoose.connect(MONGO_URL);
 mongoose.connection.on('error', (error: Error) => console.log(error));
-
-app.use('/', router());
 
