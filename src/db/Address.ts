@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 /* AddressSchema using mongoose to send the schema to MongoDB */
-const AddressSchema = new mongoose.Schema({
+export const AddressSchema = new mongoose.Schema({
     addressStreetNumber: { type: String, required: true },
     addressStreetName: { type: String, required: true },
     addressCity: { type: String, required: true },

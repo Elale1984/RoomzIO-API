@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { AddressModel } from "./Address";
+import { AddressSchema } from "./Address";
 
 const OrganizationSchema = new mongoose.Schema({
   organizationName: { type: String, required: true },
@@ -7,12 +7,12 @@ const OrganizationSchema = new mongoose.Schema({
   organizationDateCreated: { type: Date, required: true },
   organizationCapacity: { type: Number, required: true },
   organizationTotalFacilityCount: { type: Number, required: true },
-  organizationAddress: { type: AddressModel, required: true },
+  organizationAddress: { type: AddressSchema, required: true }, // Use the AddressSchema directly
   organizationFacilities: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Facility",
-      required: true,
+      req: true,
     },
   ],
 });
@@ -28,13 +28,16 @@ export const getOrganizations = () =>
 export const getOrganizationById = (id: string) =>
   OrganizationModel.findById(id).populate("organizationFacilities");
 
-export const createOrganization = (values: Record<string, any>) =>
-  new OrganizationModel(values)
-    .save()
-    .then((organization) => organization.toObject());
+export const createOrganization = async (values: Record<string, any>) => {
+  console.log('Values received for organization creation:', values);
+  const organization = await new OrganizationModel(values)
+    .save();
+  return organization.toObject();
+};
+  
 
-export const findOrganizations = (query: Record<string, any>) => {
-  return OrganizationModel.find(query).populate("organizationFacilities");
+export const findOrganization = (query: Record<string, any>) => {
+  return OrganizationModel.findOne(query);
 };
 
 export const deleteOrganizationById = (id: string) =>
