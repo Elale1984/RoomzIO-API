@@ -1,12 +1,14 @@
 import express from "express";
 import {
+  OrganizationModel,
   createOrganization,
   deleteOrganizationById,
   findOrganization,
+  getOrganizationById,
   getOrganizations,
   updateOrganizationById,
 } from "../db/organization";
-import { AddressModel } from "../db/Address"; // Adjust the path
+import { AddressModel, deleteAddressById } from "../db/Address"; // Adjust the path
 
 export const registerOrganization = async (
   req: express.Request,
@@ -16,6 +18,7 @@ export const registerOrganization = async (
     const {
       organizationName,
       organizationType,
+      organizationEmail,
       organizationCapacity,
       organizationTotalFacilityCount,
       organizationAddress,
@@ -25,6 +28,7 @@ export const registerOrganization = async (
     if (
       !organizationName ||
       !organizationType ||
+      !organizationEmail ||
       !organizationCapacity ||
       !organizationTotalFacilityCount ||
       !organizationAddress ||
@@ -41,6 +45,7 @@ export const registerOrganization = async (
     const organization = await createOrganization({
       organizationName,
       organizationType,
+      organizationEmail,
       organizationCapacity,
       organizationTotalFacilityCount,
       organizationAddress: address, // Save the address id in the organization document
@@ -62,7 +67,7 @@ export const getAllOrganizations = async (
 ) => {
   try {
     const organizations = await getOrganizations();
-    return res.status(200).json(organizations).end(0);
+    return res.status(200).json(organizations).end();
   } catch (error) {
     console.error(error);
     res.sendStatus(400);
@@ -75,12 +80,24 @@ export const deleteOrganization = async (
 ) => {
   try {
     const { id } = req.params;
-    const deletedOrganization = deleteOrganizationById(id);
-    return res.json(deletedOrganization);
+  
+    const organization = await getOrganizationById(id);
+    if (!organization) {
+      return res.sendStatus(404).json({error: 'Could not find organization with that id'}); // Organization not found
+    }
+
+    const addressId = await OrganizationModel.findOne({'organizationAddress._id': req.params.id});
+    if (!addressId) {
+      return res.sendStatus(404).json({error: 'No address was found with that id'});
+    }
+   
+    
+    return res.status(200).json(addressId);
   } catch (error) {
     console.error(error);
-    return res.sendStatus(400);
+    return res.sendStatus(500); // Internal server error
   }
+  
 };
 
 export const updateOrganization = async (
