@@ -1,5 +1,5 @@
 import express from 'express';
-import { deleteOrganization, getAllOrganizations, registerOrganization, updateOrganization } from '../controllers/organizationController';
+import { deleteOrganization, getAllOrganizations, registerOrganization, updateOrganization } from '../controllers/OrganizationController';
 
 const organizationRoutes = (router: express.Router) => {
   router.post('/organizations', registerOrganization);
