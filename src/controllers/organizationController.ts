@@ -7,7 +7,7 @@ import {
   getOrganizationById,
   getOrganizations,
   updateOrganizationById,
-} from "../db/organization";
+} from "../db/Organization";
 import { AddressModel, deleteAddressById } from "../db/Address"; // Adjust the path
 
 export const registerOrganization = async (
