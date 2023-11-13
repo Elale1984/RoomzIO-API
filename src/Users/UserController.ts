@@ -45,13 +45,13 @@ export const getCurrentUserType = async (
     const currentUser = await getUserById(id);
 
     if (!currentUser) {
-      return res.sendStatus(404);
+      return res.status(404).json('The user you are trying to get does not exist!');
     }
 
     const currentUserType = currentUser.userType;
     return res.status(200).json(currentUserType);
-  } catch (error) {
-    console.error(error);
+  } catch (e) {
+    console.log(e.message);
     return res.sendStatus(400);
   }
 };

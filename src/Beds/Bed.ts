@@ -18,7 +18,7 @@ const BedSchema = new mongoose.Schema({
   tags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tags" }],
 });
 
-export const BedModel = mongoose.model("Bed", BedSchema);
+export const BedModel = mongoose.model("Beds", BedSchema);
 
 export const getBeds = () => BedModel.find().populate("bedResident");
 

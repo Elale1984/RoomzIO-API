@@ -1,8 +1,7 @@
 import mongoose from "mongoose";
 
 export const RoomSchema = new mongoose.Schema({
-  roomName: { type: String, required: true },
-  roomType: { type: Array<string>, required: true },
+  roomNumber: { type: String, required: true },
   roomCapacity: { type: Number, required: true },
   roomDateCreated: {
     type: Date,
@@ -13,14 +12,9 @@ export const RoomSchema = new mongoose.Schema({
   roomTags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tags" }],
   isRoomLocked: { type: Boolean, default: false },
   isRoomAvailable: { type: Boolean, default: true },
-  roomBeds: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Bed",
-    },
-  ],
+  roomBeds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Beds" }],
 });
-
+ 
 export const RoomModel = mongoose.model("Room", RoomSchema);
 
 export const getRooms = () =>
