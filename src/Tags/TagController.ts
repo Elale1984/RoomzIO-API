@@ -1,4 +1,4 @@
-import { createTag, deleteTagById, findTag, getTags, updateTagById } from "../db/Tags";
+import { createTag, deleteTagById, findTag, getTags, updateTagById } from "./Tags";
 import express from "express";
 
 /**

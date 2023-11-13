@@ -1,4 +1,4 @@
-import { deleteTag, getAllTags, registerTag, updateTag } from '../controllers/TagController';
+import { deleteTag, getAllTags, registerTag, updateTag } from './TagController';
 import express  from 'express';
 
 export default (router: express.Router) => {

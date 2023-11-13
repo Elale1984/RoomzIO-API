@@ -1,4 +1,4 @@
-import { createBed, findBed } from "../db/Bed";
+import { createBed, findBed } from "./Bed";
 import express from "express";
 
 /**

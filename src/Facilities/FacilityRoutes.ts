@@ -1,5 +1,5 @@
-import { updateFacility } from 'db/Facility';
-import { deleteFacility, getAllFacilities, registerFacility } from '../controllers/FacilityController';
+import { updateFacility } from 'Facilities/Facility';
+import { deleteFacility, getAllFacilities, registerFacility } from './FacilityController';
 import express from 'express';
 
 export default (router: express.Router) => {

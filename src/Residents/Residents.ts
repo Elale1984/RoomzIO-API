@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { RoomSchema } from "./Room";
+import { RoomSchema } from "../db/Room";
 /* ResidentSchema using mongoose to send the schema to MongoDB */
 const ResidentSchema = new mongoose.Schema({
   firstName: { type: String, required: true },

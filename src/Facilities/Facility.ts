@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { AddressModel } from "./Address";
+import { AddressModel } from "../Address/Address";
 
 const FacilitySchema = new mongoose.Schema({
   facilityName: { type: String, required: true },

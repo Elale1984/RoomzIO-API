@@ -1,4 +1,4 @@
-import { createAddress, deleteAddressById, findAddress, getAddresses, updateAddressById } from "../db/Address";
+import { createAddress, deleteAddressById, findAddress, getAddresses, updateAddressById } from "./Address";
 import express from "express";
 
 export const createNewAddress = async (req: express.Request, res: express.Response) => {

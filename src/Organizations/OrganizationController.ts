@@ -7,8 +7,8 @@ import {
   getOrganizationById,
   getOrganizations,
   updateOrganizationById,
-} from "../db/Organization";
-import { AddressModel, deleteAddressById } from "../db/Address"; // Adjust the path
+} from "./Organization";
+import { AddressModel, deleteAddressById } from "../Address/Address"; // Adjust the path
 
 export const registerOrganization = async (
   req: express.Request,

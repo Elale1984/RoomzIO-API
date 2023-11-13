@@ -1,4 +1,4 @@
-import { deleteResident, getAllResidents, registerResident, updateResident } from '../controllers/ResidentController';
+import { deleteResident, getAllResidents, registerResident, updateResident } from './ResidentController';
 import express  from 'express';
 
 export default (router: express.Router) => {

@@ -1,4 +1,4 @@
-import { registerBed } from "../controllers/BedController";
+import { registerBed } from "./BedController";
 import express from "express";
 
 export default (router: express.Router) => {

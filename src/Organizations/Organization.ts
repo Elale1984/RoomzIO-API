@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { AddressModel, AddressSchema } from "./Address";
+import { AddressModel, AddressSchema } from "../Address/Address";
 
 const OrganizationSchema = new mongoose.Schema({
   organizationName: { type: String, required: true },

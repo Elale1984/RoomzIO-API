@@ -1,11 +1,11 @@
 import express from 'express';
-import authentication from './AuthenticationRoutes';
-import users from './UserRoutes';
-import organizationRoutes from './OrganizationRoutes';
-import AddressRoutes from './AddressRoutes';
-import TagRoute from './TagRoute';
-import BedRoutes from './BedRoutes';
-import ResidentRoutes from './ResidentRoutes';
+import authentication from '../Auth/AuthenticationRoutes';
+import users from '../Users/UserRoutes';
+import organizationRoutes from '../Organizations/OrganizationRoutes';
+import AddressRoutes from '../Address/AddressRoutes';
+import TagRoute from '../Tags/TagRoute';
+import BedRoutes from '../Beds/BedRoutes';
+import ResidentRoutes from '../Residents/ResidentRoutes';
 
 const router = express.Router();
 
