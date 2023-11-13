@@ -1,13 +1,16 @@
 import mongoose from "mongoose";
 
 const BedSchema = new mongoose.Schema({
-  bedNumber: { type: Number, required: true },
-  bedType: { type: String, required: true },
-  bedCapacity: { type: Number, required: true },
+  bedNumber: { type: String, required: true },
   bedDateCreated: {
     type: Date,
     immutable: true,
     default: () => Date.now(),
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
   },
   isBedLocked: { type: Boolean, default: false },
   isBedAvailable: { type: Boolean, default: true },
