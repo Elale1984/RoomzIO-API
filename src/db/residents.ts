@@ -4,12 +4,21 @@ import { RoomSchema } from "./Room";
 const ResidentSchema = new mongoose.Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
-  moveInDate: { type: Date },
+  moveInDate: { type: Date, required: true },
   moveOutDate: { type: Date },
   residentDateCreated: {
     type: Date,
     immutable: true,
     default: () => Date.now(),
+  },
+  residentTags: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Tags",
+  }],
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
   },
 });
 
@@ -28,12 +37,12 @@ export const createResident = (values: Record<string, any>) =>
   new ResidentModel(values).save().then((resident) => resident.toObject());
 
 /* Find residents by specific field(s) like moveInDate, moveOutDate, or ID */
-export const findResidents = (query: Record<string, any>) => {
-  return ResidentModel.find(query);
+export const findResident = (query: Record<string, any>) => {
+  return ResidentModel.findOne(query);
 };
 
 /* Delete a resident by their ID */
-export const deleteResident = (id: string) =>
+export const deleteResidentById = (id: string) =>
   ResidentModel.findByIdAndDelete(id);
 
 /* Update a resident by their ID, modifying one or more fields */
