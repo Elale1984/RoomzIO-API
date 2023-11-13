@@ -12,7 +12,11 @@ const UserSchema = new mongoose.Schema({
     salt: { type: String, select: false },
     sessionToken: { type: String, select: false },
   },
-  dateCreated: { type: Date, required: true },
+  userDateCreated: {
+    type: Date,
+    immutable: true,
+    default: () => Date.now(),
+  },
   dateTerminated: { type: Date },
 });
 

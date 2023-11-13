@@ -1,22 +1,22 @@
 import mongoose from "mongoose";
 
-
 export const RoomSchema = new mongoose.Schema({
   roomName: { type: String, required: true },
   roomType: { type: Array<string>, required: true },
   roomCapacity: { type: Number, required: true },
-  roomDateCreated: { type: Date, required: true },
-  roomFillDate: { type: Date, required: true },
-  roomProjectedVacancyDate: { type: Date, required: true },
-  roomTags: { type: String },
-  isRoomLocked: { type: Boolean, required: true },
-  isRoomAvailable: { type: Boolean, required: true },
-  wingId: { type: mongoose.Schema.Types.ObjectId, ref: "Wing", required: true },
+  roomDateCreated: {
+    type: Date,
+    immutable: true,
+    default: () => Date.now(),
+  },
+  roomProjectedVacancyDate: { type: Date },
+  roomTags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tags" }],
+  isRoomLocked: { type: Boolean, default: false },
+  isRoomAvailable: { type: Boolean, default: true },
   roomBeds: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Bed",
-      required: true,
     },
   ],
 });
@@ -24,10 +24,10 @@ export const RoomSchema = new mongoose.Schema({
 export const RoomModel = mongoose.model("Room", RoomSchema);
 
 export const getRooms = () =>
-  RoomModel.find().populate("wingId").populate("roomBeds");
+  RoomModel.find().populate("roomBeds");
 
 export const getRoomById = (id: string) =>
-  RoomModel.findById(id).populate("wingId").populate("roomBeds");
+  RoomModel.findById(id).populate("roomBeds");
 
 export const createRoom = (values: Record<string, any>) =>
   new RoomModel(values).save().then((room) => room.toObject());
