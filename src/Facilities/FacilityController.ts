@@ -1,5 +1,5 @@
-import { AddressModel } from "../db/Address";
-import { FacilityModel, deleteFacilityById, findFacilityById, updateFacility } from "../db/Facility";
+import { AddressModel } from "../Address/Address";
+import { FacilityModel, deleteFacilityById, findFacilityById, updateFacility } from "./Facility";
 import express from "express";
 
 export const registerFacility = async (

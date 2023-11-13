@@ -1,11 +1,11 @@
-import { createTag, deleteTagById, findTag, getTags, updateTagById } from "../db/Tags";
+import { createTag, deleteTagById, findTag, getTags, updateTagById } from "./Tags";
 import express from "express";
 
 /**
- * Create a new Tag
- * ? Should only create a tag if one with the same name does not exist already
- * TODO : 
- * @param none
+ * Creates a new tag in the database.
+ * - Should only create a tag if one with the same name does not exist already.
+ * @param {express.Request} req - The Express Request object.
+ * @param {express.Response} res - The Express Response object.
  */
 export const registerTag = async (
     req: express.Request,
@@ -19,22 +19,19 @@ export const registerTag = async (
             color,
         } = req.body;
 
-        if (
-            !name ||
-            !description ||
-            !createdBy ||
-            !color
-        ) {
+        // Check for required fields
+        if (!name || !description || !createdBy || !color) {
             return res.sendStatus(400);
         }
         
+        // Check if a tag with the same name already exists
         const existingTag = await findTag({ name: name });
 
         if (existingTag) {
             return res.status(400).json('A tag with this name already exists! Tag not created.');
         }
         
-
+        // Create the tag
         const tag = await createTag({name, description, createdBy, color});
         return res.status(200).json(tag).end();
     } catch (e) {
@@ -44,29 +41,29 @@ export const registerTag = async (
 }
 
 /**
- * Get All Tags
- * ? Should return all tags in the database
- * TODO :
- * @param none
+ * Retrieves all tags from the database.
+ * - Should return all tags in the database.
+ * @param {express.Request} req - The Express Request object.
+ * @param {express.Response} res - The Express Response object.
  */
 export const getAllTags = async (
-  req: express.Request,
-  res: express.Response
+    req: express.Request,
+    res: express.Response
 ) => {
-  try {
-    const tags = await getTags();
-    return res.status(200).json(tags).end();
-  } catch (e) {
-    console.log(e.message);
-    res.status(400);
-  }
+    try {
+        const tags = await getTags();
+        return res.status(200).json(tags).end();
+    } catch (e) {
+        console.log(e.message);
+        res.status(400);
+    }
 };
 
 /**
- * Update Tag
- * ? Should update a tag given the id
- * TODO :
- * @param id
+ * Updates a tag in the database.
+ * - Should update a tag given the ID.
+ * @param {express.Request} req - The Express Request object.
+ * @param {express.Response} res - The Express Response object.
  */
 export const updateTag = async (
     req: express.Request,
@@ -76,12 +73,14 @@ export const updateTag = async (
         const { id } = req.params;
         const updatedFields = req.body;
 
-        const currentTag = await findTag({ _id: id});
+        // Find the current tag by ID
+        const currentTag = await findTag({ _id: id });
 
         if (!currentTag) {
             return res.status(404).json('Could not find tag. Edit failed.');
         }
 
+        // Update the tag
         const updatedTag = await updateTagById(id, updatedFields);
 
         if (!updatedTag) {
@@ -95,6 +94,11 @@ export const updateTag = async (
     }
 };
 
+/**
+ * Deletes a tag from the database.
+ * @param {express.Request} req - The Express Request object.
+ * @param {express.Response} res - The Express Response object.
+ */
 export const deleteTag = async (
     req: express.Request, 
     res: express.Response
@@ -102,6 +106,7 @@ export const deleteTag = async (
     try {
         const { id } = req.params;
 
+        // Delete the tag by ID
         const deletedTag = await deleteTagById(id);
 
         if (!deletedTag) {
@@ -114,5 +119,3 @@ export const deleteTag = async (
         return res.sendStatus(400);
     }    
 }; 
-
-

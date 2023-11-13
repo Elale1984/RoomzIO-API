@@ -1,4 +1,4 @@
-import { createResident, findResident, getResidents, updateResidentById, deleteResidentById } from "../db/Residents";
+import { createResident, findResident, getResidents, updateResidentById, deleteResidentById } from "./Residents";
 import express from "express";
 
 /**

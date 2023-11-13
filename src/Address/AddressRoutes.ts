@@ -1,4 +1,4 @@
-import { createNewAddress, deleteAddress, getAllAddresses, updateAddressFields } from '../controllers/AddressController';
+import { createNewAddress, deleteAddress, getAllAddresses, updateAddressFields } from './AddressController';
 import express from  'express';
 
 const AddressRoutes = (router: express.Router) => {

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { AddressModel } from "./Address";
+import { AddressModel } from "../Address/Address";
 
 /* CreditCardDetailsSchema using mongoose to send the schema to MongoDB */
 const CreditCardDetailsSchema = new mongoose.Schema({

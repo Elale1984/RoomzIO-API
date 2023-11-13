@@ -1,7 +1,7 @@
 // Importing the express module and utility functions from lodash, as well as user-related functions from the database
 import express from 'express';
 import { get, merge } from 'lodash';
-import { getUserById, getUserBySessionToken } from '../db/Users';
+import { getUserById, getUserBySessionToken } from '../Users/Users';
 
 /**
  * Middleware to check if the current user has the access level of admin.
