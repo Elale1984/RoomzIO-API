@@ -1,7 +1,7 @@
 import express from  'express';
 
-import { deleteUser, getAllUsers, getCurrentUserType, updateUserFields } from '../controllers/users';
-import { isAuthenticated, isAdmin, isManagerOrAdmin } from '../middleware/users';
+import { deleteUser, getAllUsers, getCurrentUserType, updateUserFields } from '../controllers/UserController';
+import { isAuthenticated, isAdmin, isManagerOrAdmin } from '../middleware/UserMiddleware';
 
 export default (router: express.Router) => {
     router.get('/users', isAuthenticated, getAllUsers);

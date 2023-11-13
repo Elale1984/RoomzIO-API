@@ -1,6 +1,6 @@
 import express from "express";
-import { authentication, random } from "../helpers";
-import { createUser, findUser } from '../db/Users';
+import { authentication, random } from "../helpers/AuthenticationHelper";
+import { createUser, findUser } from "../db/Users";
 
 export const login = async (req: express.Request, res: express.Response) => {
   try {
@@ -78,9 +78,8 @@ export const register = async (req: express.Request, res: express.Response) => {
       dateCreated: new Date().toLocaleDateString("en-US"),
       dateTerminated: null,
     });
-    
+
     return res.status(200).json(user).end();
-    
   } catch (error) {
     console.log(error);
     return res.sendStatus(400);

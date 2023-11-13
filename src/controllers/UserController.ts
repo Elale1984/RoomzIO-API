@@ -28,7 +28,7 @@ export const deleteUser = async (
   try {
     const { id } = req.params;
     const deletedUser = await deleteUserById(id);
-    return res.json(deletedUser);
+    return res.status(200).json(deletedUser);
   } catch (error) {
     console.error(error);
     return res.sendStatus(400);
@@ -49,7 +49,7 @@ export const getCurrentUserType = async (
     }
 
     const currentUserType = currentUser.userType;
-    return res.json(currentUserType);
+    return res.status(200).json(currentUserType);
   } catch (error) {
     console.error(error);
     return res.sendStatus(400);
@@ -78,9 +78,9 @@ export const updateUserFields = async (
       return res.sendStatus(403);
     }
 
-    await updateUserById(id, updatedFields);
+    
 
-    const updatedUser = await findUser({ _id: id });
+    const updatedUser = await updateUserById(id, updatedFields);
 
     return res.status(200).json(updatedUser).end();
   } catch (error) {
