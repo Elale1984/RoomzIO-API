@@ -23,9 +23,7 @@ export const registerWing = async (
 
     // Check that Wing name was included
     if (!wingName) {
-      logAction("ERROR", "registerWing", "validation", "Id not available", {
-        errorDetails: "Wing name is required",
-      });
+      logAction("ERROR", "registerWing", "validation", "Id not available", "Wing name is required");
       return res.status(400).json("Wing was not created!");
     }
 
@@ -33,9 +31,7 @@ export const registerWing = async (
     const existingWing = await findWing({ wingName: wingName });
 
     if (existingWing) {
-      logAction("ERROR", "registerWing", "validation", `Wing with ID of ${existingWing.id}`, {
-        errorDetails: "Wing with that name already exists. Cannot duplicate.",
-      });
+      logAction("ERROR", "registerWing", "validation", `WingID: ${existingWing.id}`, "Wing with that name already exists. Cannot duplicate.");
       return res.status(400).json("A Wing with that number already exists!");
     }
 
@@ -49,24 +45,17 @@ export const registerWing = async (
     });
 
     if (!wing) {
-      logAction("ERROR", "registerWing", "database", "Id not available", {
-        errorDetails: "Wing creation failed.",
-      });
+      logAction("ERROR", "registerWing", "database", "WingID not available", "Wing creation failed.");
       return res
         .status(400)
         .json("Oops! Something happened. Wing was not created!");
     }
 
-    logAction("INFO", "registerWing", "database", `Wing created successfully. WingID: ${wing._id}`, {
-      errorDetails: "Wing creation successfully.",
-      
-    });
+    logAction("INFO", "registerWing", "database", `WingID: ${wing._id}`, "Wing creation successfully.");
 
     return res.status(200).json(wing).end();
   } catch (e) {
-    logAction("ERROR", "registerWing", "unexpected", "Error creating wing", {
-      errorDetails: e.message,
-    });
+    logAction("ERROR", "registerWing", "unexpected", "WingID not available", e.message);
     return res.status(500).json("An error occurred!");
   }
 };
@@ -83,11 +72,11 @@ export const getAllWings = async (
 ) => {
   try {
     const wings = await getWings();
+
+    logAction("INFO", "getAllWings", "database", "WingID not available", "Failed to get all wings.");
     return res.status(200).json(wings).end();
   } catch (e) {
-    logAction("ERROR", "getAllWings", "database", "Error getting all wings", {
-      errorDetails: e.message,
-    });
+    logAction("ERROR", "getAllWings", "database", "WingID not available", e.message);
     res.status(500).json("An error occurred!");
   }
 };
@@ -109,31 +98,22 @@ export const updateWingFields = async (
     const currentWing = await findWing({ _id: id });
 
     if (!currentWing) {
-      logAction("ERROR", "updateWingFields", "validation", "Error updating wing", {
-        errorDetails: "Could not find Wing. Edit failed.",
-      });
+      logAction("ERROR", "updateWingFields", "validation", `WingID: ${id}`, "Could not find Wing. Edit failed.");
       return res.status(404).json("Could not find Wing. Edit failed.").end();
     }
 
     const updatedWing = await updateWingById(id, updatedFields);
 
     if (!updatedWing) {
-      logAction("ERROR", "updateWingFields", "database", "Wing did not update", {
-        errorDetails: "Could not modify Wing!",
-      });
+      logAction("ERROR", "updateWing", "database", `WingID: ${id}`, "Wing failed to update!");
       return res.status(400).json("Could not modify Wing!").end();
     }
 
-    logAction("INFO", "updateWingFields", "database", `Wing with ID: ${id} was updated!`, {
-      errorDetails: "Wing successfully updated.",
-      wingId: id,
-    });
+    logAction("INFO", "updateWingFields", "database", `WingID: ${id}`, "Wing successfully updated.");
 
     return res.status(200).json(updatedFields);
   } catch (e) {
-    logAction("ERROR", "updateWingFields", "unexpected", `Wing did not get updated`, {
-      errorDetails: e.message,
-    });
+    logAction("ERROR", "updateWingFields", "unexpected", "WingID not available", e.message);
     return res.status(500).json("An error occurred!");
   }
 };
@@ -153,22 +133,15 @@ export const deleteWing = async (
     const deletedWing = await deleteWingById(id);
 
     if (!deletedWing) {
-      logAction("ERROR", "deleteWing", "validation", `Wing with ID: ${id} was not found`, {
-        errorDetails: "Wing not found or already deleted.",
-      });
+      logAction("ERROR", "deleteWing", "validation", `WingID: ${id}`, "Wing not found or already deleted.");
       return res.status(404).json("Wing not found or already deleted.");
     }
 
-    logAction("INFO", "deleteWing", "database", `Wing with ID: ${id} was deleted.`, {
-      errorDetails: "Wing deleted successfully.",
-      wingId: id,
-    });
+    logAction("INFO", "deleteWing", "database", `WingID: ${id}`, "Wing deleted successfully.");
 
     return res.status(200).json("Wing was deleted successfully!");
   } catch (e) {
-    logAction("ERROR", "deleteWing", "unexpected", `Failed to delete wing`, {
-      errorDetails: e.message,
-    });
+    logAction("ERROR", "deleteWing", "unexpected", "WingID not available",  e.message);
     return res.status(500).json("An unexpected error occurred!");
   }
 };

@@ -60,7 +60,7 @@ export const logAction = async (
   action: string,
   entityType: string,
   entityId?: string,
-  details?: string | { errorDetails: string; wingId?: string }
+  details?: string 
 ): Promise<void> => {
   try {
     await RequestLogsModel.create({

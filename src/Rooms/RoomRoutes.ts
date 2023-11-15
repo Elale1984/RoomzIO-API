@@ -1,5 +1,5 @@
 import express  from 'express';
-import { deleteRoom, getAllRooms, registerRoom, updateRoomFields } from './RoomController';
+import { deleteRoom, getAllRooms, registerRoom, updateRoom } from './RoomController';
 
 /**
  * Configures routes related to rooms on the given Express Router instance.
@@ -17,5 +17,5 @@ export default (router: express.Router) => {
     router.delete('/rooms/delete/:id', deleteRoom);
 
     // PATCH endpoint to update room fields by ID
-    router.patch('/rooms/update/:id', updateRoomFields);
+    router.patch('/rooms/update/:id', updateRoom);
 }
