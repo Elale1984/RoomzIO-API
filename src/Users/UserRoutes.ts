@@ -7,8 +7,8 @@ import { isAuthenticated, isAdmin, isManagerOrAdmin } from '../middleware/UserMi
  * Configures routes related to users on the given Express Router instance.
  * @param {express.Router} router - The Express Router instance to configure.
  */
-
 export default (router: express.Router) => {
+
     // GET endpoint to retrieve all users, requires authentication
     router.get('/users', isAuthenticated, getAllUsers);
 

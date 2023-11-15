@@ -1,5 +1,12 @@
 import express from "express";
-import { createRoom, deleteRoomById, findRoom, getRooms, updateRoomById } from "./Room";
+import {
+  createRoom,
+  deleteRoomById,
+  findRoom,
+  getRooms,
+  updateRoomById,
+} from "./Room";
+import { logAction } from "../middleware/MongoDBLogs";
 
 /**
  * Creates a new room in the database.
@@ -8,42 +15,80 @@ import { createRoom, deleteRoomById, findRoom, getRooms, updateRoomById } from "
  * @param {express.Response} res - The Express Response object.
  */
 export const registerRoom = async (
-    req: express.Request, 
-    res: express.Response
+  req: express.Request,
+  res: express.Response
 ) => {
-    try {
-        const {
-            roomNumber,
-            roomCapacity,
-            createdBy,
-            roomTags,
-            roomBeds,   
-        } = req.body;
+  try {
+    const { roomNumber, roomCapacity, createdBy, roomTags, roomBeds } =
+      req.body;
 
-        // Check that room number was included
-        if (!roomNumber) {
-            return res.status(400).json('Room was not created!');
-        }
+    // Check that room number was included
+    if (!roomNumber) {
+      logAction(
+        "ERROR",
+        "registerRoom",
+        "validation",
+        "Id not available",
+        "Room Number name is required"
+      );
+      return res.status(400).json("Room was not created!");
+    }
 
-        // Check if the Room number already exists
-        const existingRoom = await findRoom({ roomNumber: roomNumber});
+    // Check if the Room number already exists
+    const existingRoom = await findRoom({ roomNumber: roomNumber });
 
-        if (existingRoom) {
-            return res.status(400).json('A Room with that number already exists!');
-        }
+    if (existingRoom) {
+      logAction(
+        "ERROR",
+        "registerRoom",
+        "validation",
+        `RoomID: ${existingRoom.id}`,
+        "Room with that name already exists. Cannot duplicate."
+      );
+      return res.status(400).json("A Room with that number already exists!");
+    }
 
-        // Create the Room
-        const room = await createRoom({roomNumber, roomCapacity, createdBy, roomTags, roomBeds});
-        
-        if (!room) {
-            return res.status(400).json('Oops! Something happened. room was not created!');
-        }
+    // Create the Room
+    const room = await createRoom({
+      roomNumber,
+      roomCapacity,
+      createdBy,
+      roomTags,
+      roomBeds,
+    });
 
-        return res.status(200).json(room).end();
-    } catch (e) {
-        console.log(e.message);
-        return res.status(500).json('An error occurred!');
-    }    
+    if (!room) {
+      logAction(
+        "ERROR",
+        "registerRoom",
+        "validation",
+        "RoomID not available",
+        "Room creation failed."
+      );
+      return res
+        .status(400)
+        .json("Oops! Something happened. room was not created!");
+    }
+
+    logAction(
+      "INFO",
+      "registerRoom",
+      "database",
+      `RoomID: ${room._id}`,
+      "Room creation successful"
+    );
+
+    return res.status(200).json(room).end();
+  } catch (e) {
+    logAction(
+      "ERROR",
+      "registerRoom",
+      "unexpected",
+      "RoomID not available",
+      e.message
+    );
+    return res.status(500).json("An error occurred!");
+  }
 };
 
 /**
@@ -53,16 +98,39 @@ export const registerRoom = async (
  * @param {express.Response} res - The Express Response object.
  */
 export const getAllRooms = async (
-    req: express.Request,
-    res: express.Response
+  req: express.Request,
+  res: express.Response
 ) => {
-    try {
-        const rooms = await getRooms();
-        return res.status(200).json(rooms).end();
-    } catch (e) {
-        console.log(e.message);
-        res.status(400);
+  try {
+    const rooms = await getRooms();
+    if (!rooms) {
+      logAction(
+        "INFO",
+        "getAllRooms",
+        "database",
+        "RoomID not available",
+        "Failed to get all rooms."
+      );
     }
+
+    logAction(
+        "INFO",
+        "getAllRooms",
+        "database",
+        "RoomID not available",
+        "Succeeded in getting all rooms."
+      );
+    return res.status(200).json(rooms).end();
+  } catch (e) {
+    logAction(
+      "ERROR",
+      "getAllRooms",
+      "unexpected",
+      "RoomID not available",
+      e.message
+    );
+    res.status(400);
+  }
 };
 
 /**
@@ -71,31 +139,60 @@ export const getAllRooms = async (
  * @param {express.Request} req - The Express Request object.
  * @param {express.Response} res - The Express Response object.
  */
-export const updateRoomFields = async (
-    req: express.Request,
-    res: express.Response
+export const updateRoom = async (
+  req: express.Request,
+  res: express.Response
 ) => {
-    try {
-        const { id } = req.params;
-        const updatedFields = req.body;
+  try {
+    const { id } = req.params;
+    const updatedFields = req.body;
 
-        const currentRoom = await findRoom({ _id: id});
+    const currentRoom = await findRoom({ _id: id });
 
-        if (!currentRoom) {
-            return res.status(404).json('Could not find Room. Edit failed.').end();
-        }
+    if (!currentRoom) {
+      logAction(
+        "ERROR",
+        "updateRoom",
+        "validation",
+        `RoomID: ${id}`,
+        "Could not find room. Edit failed."
+      );
 
-        const updatedRoom = await updateRoomById(id, updatedFields);
-
-        if (!updatedRoom) {
-            return res.status(400).json('Could not modify Room!').end();
-        }
-
-        return res.status(200).json(updatedFields);
-    } catch (e) {
-        console.log(e.message);
-        return res.status(400).json('Room was successfully updated!');
+      return res.status(404).json("Could not find Room. Edit failed.").end();
     }
+
+    const updatedRoom = await updateRoomById(id, updatedFields);
+
+    if (!updatedRoom) {
+      logAction(
+        "ERROR",
+        "updateRoom",
+        "database",
+        `RoomID: ${id}`,
+        "Room failed to update!"
+      );
+      return res.status(400).json("Could not modify Room!").end();
+    }
+
+    logAction(
+      "INFO",
+      "updateRoom",
+      "database",
+      `RoomID: ${id}`,
+      "Room successfully updated."
+    );
+
+    return res.status(200).json(updatedFields);
+  } catch (e) {
+    logAction(
+      "ERROR",
+      "updateRoom",
+      "unexpected",
+      "RoomID not available",
+      e.message
+    );
+    return res.status(400).json("Room was successfully updated!");
+  }
 };
 
 /**
@@ -104,21 +201,43 @@ export const updateRoomFields = async (
  * @param {express.Response} res - The Express Response object.
  */
 export const deleteRoom = async (
-    req: express.Request, 
-    res: express.Response
+  req: express.Request,
+  res: express.Response
 ) => {
-    try {
-        const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-        const deletedRoom = await deleteRoomById(id);
+    const deletedRoom = await deleteRoomById(id);
 
-        if (!deletedRoom) {
-            return res.status(400).json('Room was not deleted!');
-        }
+    if (!deletedRoom) {
+      logAction(
+        "ERROR",
+        "deleteRoom",
+        "validation",
+        `RoomID: ${id}`,
+        "Room not found or already deleted."
+      );
 
-        return res.status(200).json('Room was deleted successfully!');
-    } catch (e) {
-        console.log(e.message);
-        return res.sendStatus(400);
-    }    
+      return res.status(400).json("Room was not deleted!");
+    }
+    
+    logAction(
+      "INFO",
+      "deleteRoom",
+      "database",
+      `RoomID: ${id}`,
+      "Room deleted successfully."
+    );
+
+    return res.status(200).json("Room was deleted successfully!");
+  } catch (e) {
+    logAction(
+      "ERROR",
+      "deleteRoom",
+      "unexpected",
+      "RoomID not available",
+      e.message
+    );
+    return res.sendStatus(400);
+  }
 };

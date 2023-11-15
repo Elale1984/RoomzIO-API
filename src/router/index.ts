@@ -7,6 +7,7 @@ import TagRoutes from '../Tags/TagRoute';
 import BedRoutes from '../Beds/BedRoutes';
 import ResidentRoutes from '../Residents/ResidentRoutes';
 import RoomRoutes from '../Rooms/RoomRoutes';
+import WingRoutes from '../wing/WingRoutes';
 
 /**
  * Express Router instance for managing routes.
@@ -30,6 +31,7 @@ export default (): express.Router => {
     BedRoutes(router);
     ResidentRoutes(router);
     RoomRoutes(router);
+    WingRoutes(router);
 
     // Returning the main router
     return router;

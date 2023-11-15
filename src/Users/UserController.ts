@@ -6,6 +6,7 @@ import {
   getUserById,
   getUsers,
 } from "./Users";
+import { logAction } from "../middleware/MongoDBLogs";
 
 /**
  * Retrieves all users from the database.
@@ -17,12 +18,12 @@ export const getAllUsers = async (
   res: express.Response
 ) => {
   try {
-    // Get all users from the database
     const users = await getUsers();
+    logAction("INFO", "getAllUsers", "database", "All users retrieved successfully.");
     return res.status(200).json(users).end();
   } catch (error) {
-    console.error(error);
-    res.sendStatus(400); 
+    logAction("ERROR", "getAllUsers", "database", `ID unavailable`, "Failed to get all users.");
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -37,13 +38,12 @@ export const deleteUser = async (
 ) => {
   try {
     const { id } = req.params;
-
-    // Delete the user by ID
     const deletedUser = await deleteUserById(id);
+    logAction("INFO", "deleteUser", "database", `UserID: UserID: ${id}`, "User deleted successfully.");
     return res.status(200).json(deletedUser);
   } catch (error) {
-    console.error(error);
-    return res.sendStatus(400);
+    logAction("ERROR", "deleteUser", "database", error.message);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -58,20 +58,19 @@ export const getCurrentUserType = async (
 ) => {
   try {
     const { id } = req.params;
-
-    // Get the current user by ID
     const currentUser = await getUserById(id);
 
     if (!currentUser) {
+      logAction("ERROR", "getCurrentUserType", "validation", `UserID: ${id}`, "User not found.");
       return res.status(404).json('The user you are trying to get does not exist!');
     }
 
-    // Get and return the user type
     const currentUserType = currentUser.userType;
+    logAction("INFO", "getCurrentUserType", "database", `UserID: ${id}`, "User type retrieved successfully.");
     return res.status(200).json(currentUserType);
   } catch (e) {
-    console.log(e.message);
-    return res.sendStatus(400);
+    logAction("ERROR", "getCurrentUserType", "database", "UserID not available", e.message);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -87,30 +86,28 @@ export const updateUserFields = async (
   try {
     const { id } = req.params;
     const updatedFields = req.body;
-
-    // Find the current user by ID
     const currentUser = await findUser({ _id: id });
 
     if (!currentUser) {
+      logAction("ERROR", "updateUserFields", "validation", `UserID: ${id}`, "User not found.");
       return res.sendStatus(404);
     }
 
-    // Check if "username" is in the updated fields (Forbidden)
     if ("username" in updatedFields) {
+      logAction("ERROR", "updateUserFields", "validation", `UserID: ${id}`, "Username update forbidden.");
       return res.sendStatus(403);
     }
 
-    // Check if the current user matches the requested update
     if (currentUser._id.toString() !== id) {
+      logAction("ERROR", "updateUserFields", "validation", `UserID: ${id}`, "Unauthorized attempt to update user fields.");
       return res.sendStatus(403);
     }
 
-    // Update the user
     const updatedUser = await updateUserById(id, updatedFields);
-
+    logAction("INFO", "updateUserFields", "database", `User fields updated successfully. UserID: ${id}`);
     return res.status(200).json(updatedUser).end();
   } catch (error) {
-    console.error(error);
-    return res.sendStatus(400);
+    logAction("ERROR", "updateUserFields", "UserID not available", error.message);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
