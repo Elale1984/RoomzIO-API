@@ -1,5 +1,12 @@
 import express from "express";
-import { createWing, deleteWingById, findWing, getWings, updateWingById } from "./Wings";
+import {
+  createWing,
+  deleteWingById,
+  findWing,
+  getWings,
+  updateWingById,
+} from "./Wings";
+import { logAction } from "../middleware/MongoDBLogs";
 
 /**
  * Creates a new Wing in the database.
@@ -8,42 +15,60 @@ import { createWing, deleteWingById, findWing, getWings, updateWingById } from "
  * @param {express.Response} res - The Express Response object.
  */
 export const registerWing = async (
-    req: express.Request, 
-    res: express.Response
+  req: express.Request,
+  res: express.Response
 ) => {
-    try {
-        const {
-            wingName,
-            wingCapacity,
-            createdBy,
-            wingTags,
-            wingRooms,   
-        } = req.body;
+  try {
+    const { wingName, wingCapacity, createdBy, wingTags, wingRooms } = req.body;
 
-        // Check that Wing number was included
-        if (!wingName) {
-            return res.status(400).json('Wing was not created!');
-        }
+    // Check that Wing name was included
+    if (!wingName) {
+      logAction("ERROR", "registerWing", "validation", "Id not available", {
+        errorDetails: "Wing name is required",
+      });
+      return res.status(400).json("Wing was not created!");
+    }
 
-        // Check if the Wing number already exists
-        const existingWing = await findWing({ wingName: wingName});
+    // Check if the Wing name already exists
+    const existingWing = await findWing({ wingName: wingName });
 
-        if (existingWing) {
-            return res.status(400).json('A Wing with that number already exists!');
-        }
+    if (existingWing) {
+      logAction("ERROR", "registerWing", "validation", `Wing with ID of ${existingWing.id}`, {
+        errorDetails: "Wing with that name already exists. Cannot duplicate.",
+      });
+      return res.status(400).json("A Wing with that number already exists!");
+    }
 
-        // Create the Wing
-        const wing = await createWing({wingName, wingCapacity, createdBy, wingTags, wingRooms});
-        
-        if (!wing) {
-            return res.status(400).json('Oops! Something happened. Wing was not created!');
-        }
+    // Create the Wing
+    const wing = await createWing({
+      wingName,
+      wingCapacity,
+      createdBy,
+      wingTags,
+      wingRooms,
+    });
 
-        return res.status(200).json(wing).end();
-    } catch (e) {
-        console.log(e.message);
-        return res.status(500).json('An error occurred!');
-    }    
+    if (!wing) {
+      logAction("ERROR", "registerWing", "database", "Id not available", {
+        errorDetails: "Wing creation failed.",
+      });
+      return res
+        .status(400)
+        .json("Oops! Something happened. Wing was not created!");
+    }
+
+    logAction("INFO", "registerWing", "database", `Wing created successfully. WingID: ${wing._id}`, {
+      errorDetails: "Wing creation successfully.",
+      
+    });
+
+    return res.status(200).json(wing).end();
+  } catch (e) {
+    logAction("ERROR", "registerWing", "unexpected", "Error creating wing", {
+      errorDetails: e.message,
+    });
+    return res.status(500).json("An error occurred!");
+  }
 };
 
 /**
@@ -53,16 +78,18 @@ export const registerWing = async (
  * @param {express.Response} res - The Express Response object.
  */
 export const getAllWings = async (
-    req: express.Request,
-    res: express.Response
+  req: express.Request,
+  res: express.Response
 ) => {
-    try {
-        const wings = await getWings();
-        return res.status(200).json(wings).end();
-    } catch (e) {
-        console.log(e.message);
-        res.status(400);
-    }
+  try {
+    const wings = await getWings();
+    return res.status(200).json(wings).end();
+  } catch (e) {
+    logAction("ERROR", "getAllWings", "database", "Error getting all wings", {
+      errorDetails: e.message,
+    });
+    res.status(500).json("An error occurred!");
+  }
 };
 
 /**
@@ -72,30 +99,43 @@ export const getAllWings = async (
  * @param {express.Response} res - The Express Response object.
  */
 export const updateWingFields = async (
-    req: express.Request,
-    res: express.Response
+  req: express.Request,
+  res: express.Response
 ) => {
-    try {
-        const { id } = req.params;
-        const updatedFields = req.body;
+  try {
+    const { id } = req.params;
+    const updatedFields = req.body;
 
-        const currentWing = await findWing({ _id: id});
+    const currentWing = await findWing({ _id: id });
 
-        if (!currentWing) {
-            return res.status(404).json('Could not find Wing. Edit failed.').end();
-        }
-
-        const updatedWing = await updateWingById(id, updatedFields);
-
-        if (!updatedWing) {
-            return res.status(400).json('Could not modify Wing!').end();
-        }
-
-        return res.status(200).json(updatedFields);
-    } catch (e) {
-        console.log(e.message);
-        return res.status(400).json('Wing was successfully updated!');
+    if (!currentWing) {
+      logAction("ERROR", "updateWingFields", "validation", "Error updating wing", {
+        errorDetails: "Could not find Wing. Edit failed.",
+      });
+      return res.status(404).json("Could not find Wing. Edit failed.").end();
     }
+
+    const updatedWing = await updateWingById(id, updatedFields);
+
+    if (!updatedWing) {
+      logAction("ERROR", "updateWingFields", "database", "Wing did not update", {
+        errorDetails: "Could not modify Wing!",
+      });
+      return res.status(400).json("Could not modify Wing!").end();
+    }
+
+    logAction("INFO", "updateWingFields", "database", `Wing with ID: ${id} was updated!`, {
+      errorDetails: "Wing successfully updated.",
+      wingId: id,
+    });
+
+    return res.status(200).json(updatedFields);
+  } catch (e) {
+    logAction("ERROR", "updateWingFields", "unexpected", `Wing did not get updated`, {
+      errorDetails: e.message,
+    });
+    return res.status(500).json("An error occurred!");
+  }
 };
 
 /**
@@ -104,21 +144,31 @@ export const updateWingFields = async (
  * @param {express.Response} res - The Express Response object.
  */
 export const deleteWing = async (
-    req: express.Request, 
-    res: express.Response
+  req: express.Request,
+  res: express.Response
 ) => {
-    try {
-        const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-        const deletedWing = await deleteWingById(id);
+    const deletedWing = await deleteWingById(id);
 
-        if (!deletedWing) {
-            return res.status(400).json('Wing was not deleted!');
-        }
+    if (!deletedWing) {
+      logAction("ERROR", "deleteWing", "validation", `Wing with ID: ${id} was not found`, {
+        errorDetails: "Wing not found or already deleted.",
+      });
+      return res.status(404).json("Wing not found or already deleted.");
+    }
 
-        return res.status(200).json('Wing was deleted successfully!');
-    } catch (e) {
-        console.log(e.message);
-        return res.sendStatus(400);
-    }    
+    logAction("INFO", "deleteWing", "database", `Wing with ID: ${id} was deleted.`, {
+      errorDetails: "Wing deleted successfully.",
+      wingId: id,
+    });
+
+    return res.status(200).json("Wing was deleted successfully!");
+  } catch (e) {
+    logAction("ERROR", "deleteWing", "unexpected", `Failed to delete wing`, {
+      errorDetails: e.message,
+    });
+    return res.status(500).json("An unexpected error occurred!");
+  }
 };

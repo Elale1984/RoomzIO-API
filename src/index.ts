@@ -6,6 +6,7 @@ import compression from 'compression';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import router from './router';
+import { createRequestLog } from './middleware/MongoDBLogs';
 
 
 
@@ -20,7 +21,8 @@ app.use(compression());
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use('/', router());
-
+// Apply middleware globally
+app.use(createRequestLog);
 const server = http.createServer(app);
 
 server.listen(8080, () => {
