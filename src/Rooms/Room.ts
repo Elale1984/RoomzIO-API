@@ -30,7 +30,7 @@ export const RoomSchema = new mongoose.Schema({
 });
 
 // Creating the Room model
-export const RoomModel = mongoose.model("Room", RoomSchema);
+export const RoomModel = mongoose.model("Rooms", RoomSchema);
 
 /**
  * Retrieves all rooms from the database, populating the 'roomBeds' field.
