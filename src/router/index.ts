@@ -7,7 +7,7 @@ import TagRoutes from '../Tags/TagRoute';
 import BedRoutes from '../Beds/BedRoutes';
 import ResidentRoutes from '../Residents/ResidentRoutes';
 import RoomRoutes from '../Rooms/RoomRoutes';
-import WingRoutes from '../wing/WingRoutes';
+import WingRoutes from '../Wing/WingRoutes';
 import FacilityRoutes from '../Facilities/FacilityRoutes';
 import ServiceTypesRoutes from '../ServiceTypes/ServiceTypesRoutes';
 

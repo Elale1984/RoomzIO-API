@@ -1,3 +1,4 @@
+import { isAuthenticated } from '../middleware/UserMiddleware';
 import { deleteTag, getAllTags, registerTag, updateTag } from './TagController';
 import express  from 'express';
 
@@ -8,14 +9,14 @@ import express  from 'express';
 
 export default (router: express.Router) => {
     // GET endpoint to retrieve all tags
-    router.get('/tags', getAllTags);
+    router.get('/tags', isAuthenticated, getAllTags);
 
     // POST endpoint to register a new tag
-    router.post('/tags', registerTag);
+    router.post('/tags', isAuthenticated, registerTag);
 
     // DELETE endpoint to delete a tag by ID
-    router.delete('/tags/delete/:id', deleteTag);
+    router.delete('/tags/delete/:id', isAuthenticated, deleteTag);
 
     // PATCH endpoint to update a tag by ID
-    router.patch('/tags/update/:id', updateTag);
+    router.patch('/tags/update/:id', isAuthenticated, updateTag);
 }

@@ -1,3 +1,4 @@
+import { isAuthenticated, isManagerOrAdmin } from '../middleware/UserMiddleware';
 import { deleteResident, getAllResidents, registerResident, updateResident } from './ResidentController';
 import express  from 'express';
 
@@ -8,14 +9,14 @@ import express  from 'express';
 
 export default (router: express.Router) => {
     // Get all residents
-    router.get('/resident', getAllResidents);
+    router.get('/resident', isAuthenticated, getAllResidents);
 
     // Create a new resident
-    router.post('/resident', registerResident);
+    router.post('/resident', isAuthenticated, isManagerOrAdmin, registerResident);
 
     // Delete a resident by ID
-    router.delete('/resident/delete/:id', deleteResident);
+    router.delete('/resident/delete/:id', isAuthenticated, isManagerOrAdmin, deleteResident);
 
     // Update a resident by ID
-    router.patch('/resident/update/:id', updateResident);
+    router.patch('/resident/update/:id', isAuthenticated, isManagerOrAdmin, updateResident);
 };
