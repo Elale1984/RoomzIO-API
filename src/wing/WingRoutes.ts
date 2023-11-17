@@ -6,7 +6,7 @@ import { deleteWing, getAllWings, registerWing, updateWingFields } from './WingC
  * @param {express.Router} router - The Express Router instance to configure.
  */
 
-export default (router: express.Router) => {
+const wingRouter = (router: express.Router) => {
     // GET endpoint to retrieve all Wings
     router.get('/wings', getAllWings);
 
@@ -19,3 +19,5 @@ export default (router: express.Router) => {
     // PATCH endpoint to update Wing fields by ID
     router.patch('/wings/update/:id', updateWingFields);
 }
+
+export default wingRouter;

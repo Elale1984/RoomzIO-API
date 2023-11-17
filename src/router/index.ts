@@ -8,6 +8,8 @@ import BedRoutes from '../Beds/BedRoutes';
 import ResidentRoutes from '../Residents/ResidentRoutes';
 import RoomRoutes from '../Rooms/RoomRoutes';
 import WingRoutes from '../wing/WingRoutes';
+import FacilityRoutes from '../Facilities/FacilityRoutes';
+import ServiceTypesRoutes from '../ServiceTypes/ServiceTypesRoutes';
 
 /**
  * Express Router instance for managing routes.
@@ -32,7 +34,8 @@ export default (): express.Router => {
     ResidentRoutes(router);
     RoomRoutes(router);
     WingRoutes(router);
-
+    FacilityRoutes(router);
+    ServiceTypesRoutes(router);
     // Returning the main router
     return router;
 };

@@ -1,44 +1,54 @@
 import mongoose from "mongoose";
-import { AddressModel } from "../Address/Address";
 
 const FacilitySchema = new mongoose.Schema({
   facilityName: { type: String, required: true },
-  facilityType: { type: Array<String>, required: true },
   facilityCapacity: { type: Number, required: true },
-  facilityWingCount: { type: Number, required: true },
-  facilityAddress: { type: AddressModel, required: true },
+  facilityAddress: { type: mongoose.Schema.Types.ObjectId, ref: "Addresses" },
   facilityDateCreated: {
     type: Date,
     immutable: true,
     default: () => Date.now(),
   },
-  isFacilityLocked: { type: Boolean, required: true },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Users",
+    required: true,
+  },
+  facilityTypes: [{ type: mongoose.Schema.Types.ObjectId, ref: "ServiceTypes" }],  
+  facilityTags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tags" }],
+  isFacilityLocked: { type: Boolean, default: false },
+  isFacilityAvailable: { type: Boolean, default: true },
   facilityWings: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Wing",
-      required: true,
+      ref: "Wings",
     },
   ],
 });
 
-export const FacilityModel = mongoose.model("Facility", FacilitySchema);
+export const FacilityModel = mongoose.model("Facilities", FacilitySchema);
 
-export const getFacilities = () => FacilityModel.find();
+export const getFacilities = () => 
+  FacilityModel.find().populate("facilityWings");
 
-export const findFacilityById = (id: string) => FacilityModel.findById(id);
+export const findFacilityById = (id: string) => 
+  FacilityModel.findById(id).populate("facilityWings");
 
-export const createFacility = async (values: Record<string, any>) => {
-  const facility = await new FacilityModel(values)
-    .save();
-  return facility.toObject();
+export const createFacility = (values: Record<string, any>) => 
+ new FacilityModel(values).save().then((facilityModel) => facilityModel.toObject());
+
+export const findFacility = (query: Record<string, any>) => {
+  return FacilityModel.findOne(query)
+    .populate("facilityWings");
 };
 
+export const deleteFacilityById = (id: string) => 
+  FacilityModel.findByIdAndDelete(id);
 
-export const deleteFacilityById = async (id: string) => {
-  FacilityModel.deleteOne({_id: id});
-}
-
-export const updateFacility =async (id:string, updatedFields: Record<string, any>) => {
+export const updateFacilityById = (
+  id: string,
+  updatedFields: Record<string, any>
+) => {
   return FacilityModel.findByIdAndUpdate(id, updatedFields);
-}
+};
+
