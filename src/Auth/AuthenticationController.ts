@@ -44,7 +44,7 @@ export const login = async (req: express.Request, res: express.Response) => {
 
 export const register = async (req: express.Request, res: express.Response) => {
   try {
-    const { firstName, lastName, username, userType, email, password } =
+    const { firstName, lastName, username, userType, email, title, password } =
       req.body;
 
     if (
@@ -71,6 +71,7 @@ export const register = async (req: express.Request, res: express.Response) => {
       username,
       userType,
       email,
+      title, 
       authentication: {
         salt,
         password: authentication(salt, password),
