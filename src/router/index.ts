@@ -10,6 +10,7 @@ import RoomRoutes from '../Rooms/RoomRoutes';
 import WingRoutes from '../Wing/WingRoutes';
 import FacilityRoutes from '../Facilities/FacilityRoutes';
 import ServiceTypesRoutes from '../ServiceTypes/ServiceTypesRoutes';
+import AlertsRoutes from '../Alerts/AlertsRoutes';
 
 /**
  * Express Router instance for managing routes.
@@ -36,6 +37,8 @@ export default (): express.Router => {
     WingRoutes(router);
     FacilityRoutes(router);
     ServiceTypesRoutes(router);
+    AlertsRoutes(router);
+
     // Returning the main router
     return router;
 };
