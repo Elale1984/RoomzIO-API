@@ -2,7 +2,7 @@ import { createNewAddress, deleteAddress, getAllAddresses, updateAddressFields }
 import express from  'express';
 
 const AddressRoutes = (router: express.Router) => {
-    router.post('/addresses', createNewAddress);
+    router.post('/address', createNewAddress);
     router.get('/address', getAllAddresses);
     router.delete('/address/delete/:id', deleteAddress);
     router.patch('/address/update/:id', updateAddressFields);

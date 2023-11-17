@@ -1,14 +1,13 @@
 import express from "express";
 import {
-  OrganizationModel,
+
   createOrganization,
   deleteOrganizationById,
   findOrganization,
-  getOrganizationById,
   getOrganizations,
   updateOrganizationById,
 } from "./Organization";
-import { AddressModel, deleteAddressById } from "../Address/Address"; // Adjust the path
+import { logAction } from "../middleware/MongoDBLogs";
 
 export const registerOrganization = async (
   req: express.Request,
@@ -17,90 +16,120 @@ export const registerOrganization = async (
   try {
     const {
       organizationName,
-      organizationType,
       organizationEmail,
-      organizationCapacity,
-      organizationTotalFacilityCount,
+      organizationTypes,
       organizationAddress,
       organizationFacilities,
     } = req.body;
 
-    if (
-      !organizationName ||
-      !organizationType ||
-      !organizationEmail ||
-      !organizationCapacity ||
-      !organizationTotalFacilityCount ||
-      !organizationAddress ||
-      !organizationFacilities ||
-      !organizationFacilities
-    ) {
-      return res.sendStatus(400);
+    if (!organizationName) {
+      logAction(
+        "ERROR",
+        "registerOrganization",
+        "validation",
+        "Id not available",
+        "Organization name is required"
+      );
+      return res.status(400).json("Organization was not created!");
     }
 
-    // Create the address document
-    const address = await new AddressModel(organizationAddress).save();
+    // Check if the Organization name already exists
+    const existingOrganization = await findOrganization({ organizationName: organizationName });
 
-    // Create the organization document with the associated address
+    if (existingOrganization) {
+      logAction(
+        "ERROR",
+        "registerOrganization",
+        "validation",
+        `OrganizationID: ${existingOrganization.id}`,
+        "Organization with that name already exists. Cannot duplicate."
+      );
+      return res.status(400).json("A Organization with that number already exists!");
+    }
+
+    // Create the Organization
     const organization = await createOrganization({
       organizationName,
-      organizationType,
       organizationEmail,
-      organizationCapacity,
-      organizationTotalFacilityCount,
-      organizationAddress: address, // Save the address id in the organization document
+      organizationTypes,
+      organizationAddress,
       organizationFacilities,
-      organizationDateCreated: new Date().toLocaleDateString("en-US"),
     });
 
-    // Respond with the created organization
-    res.status(200).json(organization).end();
-  } catch (error) {
-    console.log(error);
-    return res.sendStatus(400);
+    if (!organization) {
+      logAction(
+        "ERROR",
+        "registerOrganization",
+        "database",
+        "OrganizationID not available",
+        "Organization creation failed."
+      );
+      return res
+        .status(400)
+        .json("Oops! Something happened. Organization was not created!");
+    }
+
+    logAction(
+      "INFO",
+      "registerOrganization",
+      "database",
+      `OrganizationID: ${organization._id}`,
+      "Organization creation successfully."
+    );
+
+    return res.status(200).json(organization).end();
+  } catch (e) {
+    logAction(
+      "ERROR",
+      "registerOrganization",
+      "unexpected",
+      "OrganizationID not available",
+      e.message
+    );
+    return res.status(500).json("An error occurred!");
   }
 };
 
+/**
+ * Retrieves all Facilities from the database.
+ * - Should return all Facilities in the database.
+ * @param {express.Request} req - The Express Request object.
+ * @param {express.Response} res - The Express Response object.
+ */
 export const getAllOrganizations = async (
   req: express.Request,
   res: express.Response
 ) => {
   try {
-    const organizations = await getOrganizations();
-    return res.status(200).json(organizations).end();
-  } catch (error) {
-    console.error(error);
-    res.sendStatus(400);
+    const organization = await getOrganizations();
+
+    logAction(
+      "INFO",
+      "getAllFacilities",
+      "database",
+      "OrganizationID not available",
+      "Failed to get all organization."
+    );
+    return res.status(200).json(organization).end();
+  } catch (e) {
+    logAction(
+      "ERROR",
+      "getAllFacilities",
+      "database",
+      "OrganizationID not available",
+      e.message
+    );
+    res.status(500).json("An error occurred!");
   }
 };
 
-export const deleteOrganization = async (
-  req: express.Request,
-  res: express.Response
-) => {
-  try {
-    const { id } = req.params;
-  
-    const organization = await getOrganizationById(id);
-    if (!organization) {
-      return res.sendStatus(404).json({error: 'Could not find organization with that id'}); // Organization not found
-    }
-
-    const addressId = await OrganizationModel.findOne({'organizationAddress._id': req.params.id});
-    if (!addressId) {
-      return res.sendStatus(404).json({error: 'No address was found with that id'});
-    }
-   
-    
-    return res.status(200).json(addressId);
-  } catch (error) {
-    console.error(error);
-    return res.sendStatus(500); // Internal server error
-  }
-  
-};
-
-export const updateOrganization = async (
+/**
+ * Updates a Organization in the database.
+ * - Should update a Organization given the id.
+ * @param {express.Request} req - The Express Request object.
+ * @param {express.Response} res - The Express Response object.
+ */
+export const updateOrganizationFields = async (
   req: express.Request,
   res: express.Response
 ) => {
@@ -111,18 +140,92 @@ export const updateOrganization = async (
     const currentOrganization = await findOrganization({ _id: id });
 
     if (!currentOrganization) {
-      return res.sendStatus(404);
-    }
-
-    if (currentOrganization._id.toString() !== id) {
-      return res.sendStatus(403);
+      logAction(
+        "ERROR",
+        "updateOrganizationFields",
+        "validation",
+        `OrganizationID: ${id}`,
+        "Could not find Organization. Edit failed."
+      );
+      return res.status(404).json("Could not find Organization. Edit failed.").end();
     }
 
     const updatedOrganization = await updateOrganizationById(id, updatedFields);
 
-    return res.status(200).json(updatedOrganization).end();
-  } catch (error) {
-    console.error(error);
-    return res.sendStatus(400);
+    if (!updatedOrganization) {
+      logAction(
+        "ERROR",
+        "updateOrganization",
+        "database",
+        `OrganizationID: ${id}`,
+        "Organization failed to update!"
+      );
+      return res.status(400).json("Could not modify Organization!").end();
+    }
+
+    logAction(
+      "INFO",
+      "updateOrganizationFields",
+      "database",
+      `OrganizationID: ${id}`,
+      "Organization successfully updated."
+    );
+
+    return res.status(200).json(updatedFields);
+  } catch (e) {
+    logAction(
+      "ERROR",
+      "updateOrganizationFields",
+      "unexpected",
+      "OrganizationID not available",
+      e.message
+    );
+    return res.status(500).json("An error occurred!");
+  }
+};
+
+/**
+ * Deletes a Organization from the database.
+ * @param {express.Request} req - The Express Request object.
+ * @param {express.Response} res - The Express Response object.
+ */
+export const deleteOrganization = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  try {
+    const { id } = req.params;
+
+    const deletedOrganization = await deleteOrganizationById(id);
+
+    if (!deletedOrganization) {
+      logAction(
+        "ERROR",
+        "deleteOrganization",
+        "validation",
+        `OrganizationID: ${id}`,
+        "Organization not found or already deleted."
+      );
+      return res.status(404).json("Organization not found or already deleted.");
+    }
+
+    logAction(
+      "INFO",
+      "deleteOrganization",
+      "database",
+      `OrganizationID: ${id}`,
+      "Organization deleted successfully."
+    );
+
+    return res.status(200).json("Organization was deleted successfully!");
+  } catch (e) {
+    logAction(
+      "ERROR",
+      "deleteOrganization",
+      "unexpected",
+      "OrganizationID not available",
+      e.message
+    );
+    return res.status(500).json("An unexpected error occurred!");
   }
 };

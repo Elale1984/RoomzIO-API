@@ -8,14 +8,16 @@ const WingSchema = new mongoose.Schema({
     immutable: true,
     default: () => Date.now(),
   },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Users",
+    required: true,
+  },
+  wingTypes: [{ type: mongoose.Schema.Types.ObjectId, ref: "servicetypes" }],
   wingTags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tags" }],
   isWingLocked: { type: Boolean, default: false },
-  wingRooms: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Rooms",
-    },
-  ],
+  isWingAvailable: { type: Boolean, default: true },
+  wingRooms: [{ type: mongoose.Schema.Types.ObjectId, ref: "Rooms", }],
 });
 
 export const WingModel = mongoose.model("Wings", WingSchema);
@@ -42,14 +44,5 @@ export const updateWingById = (
   updatedFields: Record<string, any>
 ) => {
   return WingModel.findByIdAndUpdate(id, updatedFields, { new: true })
-    .populate("wingRooms");
-};
-
-export const addRoomToWingById = (wingId: string, roomId: string) => {
-  return WingModel.findByIdAndUpdate(
-    wingId,
-    { $push: { wingRooms: roomId } },
-    { new: true }
-  )
     .populate("wingRooms");
 };

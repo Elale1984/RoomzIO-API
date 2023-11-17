@@ -10,7 +10,7 @@ export const AddressSchema = new mongoose.Schema({
 });
 
 /* Creating the Mongoose model for Address objects */
-export const AddressModel = mongoose.model('Address', AddressSchema);
+export const AddressModel = mongoose.model('Addresses', AddressSchema);
 
 /* Retrieve all Addresses from the database for in house use */
 export const getAddresses = () => AddressModel.find();
