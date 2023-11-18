@@ -11,7 +11,8 @@ import WingRoutes from '../Wing/WingRoutes';
 import FacilityRoutes from '../Facilities/FacilityRoutes';
 import ServiceTypesRoutes from '../ServiceTypes/ServiceTypesRoutes';
 import AlertsRoutes from '../Alerts/AlertsRoutes';
-
+import MessageCenterRoutes from '../MessageCenter/MessageCenterRoutes';
+import NotificationsRoutes from '../Notifications/NotificationsRoutes';
 /**
  * Express Router instance for managing routes.
  * @typedef {express.Router} Router
@@ -38,6 +39,9 @@ export default (): express.Router => {
     FacilityRoutes(router);
     ServiceTypesRoutes(router);
     AlertsRoutes(router);
+    NotificationsRoutes(router);
+    MessageCenterRoutes(router);
+
 
     // Returning the main router
     return router;
