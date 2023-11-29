@@ -1,6 +1,10 @@
 import express from "express";
 import { authentication, random } from "../helpers/AuthenticationHelper";
 import { createUser, findUser } from "../Users/Users";
+const uuidv4 = require('uuid').v4;
+
+// Initialize sessions outside the function
+const sessions: Record<string, { username: string, userId: string }> = {};
 
 export const login = async (req: express.Request, res: express.Response) => {
   try {
@@ -20,7 +24,7 @@ export const login = async (req: express.Request, res: express.Response) => {
 
     const expectedHash = authentication(user.authentication.salt, password);
 
-    if (user.authentication.password != expectedHash) {
+    if (user.authentication.password !== expectedHash) {
       return res.sendStatus(403);
     }
 
@@ -31,10 +35,14 @@ export const login = async (req: express.Request, res: express.Response) => {
     );
     await user.save();
 
-    res.cookie("ROOMZIO-AUTH", user.authentication.sessionToken, {
-      domain: "localhost",
-      path: "/",
-    });
+    const sessionId = uuidv4();
+
+    // Store the session ID in your sessions object or database
+    sessions[sessionId] = { username, userId: user._id.toString() };
+
+    // Set the session ID as a cookie
+    res.cookie('session', sessionId, { httpOnly: true });
+
     return res.status(200).json(user).end();
   } catch (error) {
     console.log(error);
@@ -84,5 +92,16 @@ export const register = async (req: express.Request, res: express.Response) => {
   } catch (error) {
     console.log(error);
     return res.sendStatus(400);
+  }
+};
+
+export const logout = async (req: express.Request, res: express.Response) => {
+  try {
+
+
+    return res.status(200).json({ message: "Logout successful" }).end();
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(500);
   }
 };

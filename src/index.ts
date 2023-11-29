@@ -1,25 +1,26 @@
 import express from 'express';
 import http from 'http';
 import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import router from './router';
 import { createRequestLog } from './middleware/MongoDBLogs';
-
-
-
+import cookieParser from 'cookie-parser';
 
 const app = express();
 
 app.use(cors({
+    origin: 'http://localhost:3000',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
 }));
 
-app.use(compression());
 app.use(cookieParser());
+
+app.use(compression());
 app.use(bodyParser.json());
+
 app.use('/', router());
 // Apply middleware globally
 app.use(createRequestLog);
